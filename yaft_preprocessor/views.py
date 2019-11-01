@@ -12,5 +12,5 @@ class PreprocessView(APIView):
         if not lang or lang not in LANGUAGES:
             return Response({'error': 'Bad lang query parameter value.'}, status=400)
         data = request.data
-        document_list = data.getlist('documents') if hasattr(data, 'getlist') else data.get('documents')
-        return Response(preprocess_documents(document_list, lang))
+        documents_dict = data.get('documents')
+        return Response(preprocess_documents(documents_dict, lang))

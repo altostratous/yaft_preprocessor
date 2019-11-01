@@ -30,45 +30,37 @@ LANGUAGE_PUNCTUATION = {
 }
 
 
+LANGUAGE_STEMMER = {
+    FA: Stemmer().stem,
+    EN: PorterStemmer().stem,
+}
+
+LANGUAGE_NORMALIZER = {
+    EN: lambda x: x.lower(),
+    FA: Normalizer().normalize,
+}
+
+LANGUAGE_TOKENIZER = {
+    FA: WordTokenizer().tokenize,
+    EN: word_tokenize,
+}
+
+
 def remove_stop_words(tokens, language):
-    return [token for token in tokens if token not in LANGUAGE_STOPWORDS[language]]
+    return {i: token for i, token in enumerate(tokens) if token not in LANGUAGE_STOPWORDS[language]}
 
 
 def remove_punctuation(tokens, language):
     return [token for token in tokens if token not in LANGUAGE_PUNCTUATION[language]]
 
 
-def preprocess_fa_language(document: str):
-    normalizer = Normalizer()
-    normalized_document = normalizer.normalize(document)
-    tokenizer = WordTokenizer()
-    tokens = tokenizer.tokenize(normalized_document)
-    words = remove_punctuation(tokens, FA)
-    non_stop_word_words = remove_stop_words(words, FA)
-    stemmer = Stemmer()
-    stemmed_words = [stemmer.stem(word) for word in non_stop_word_words]
-    return stemmed_words
-
-
-def preprocess_en_document(document: str):
-    normalized_document = document.lower()
-    tokens = word_tokenize(normalized_document)
-    words = remove_punctuation(tokens, EN)
-    non_stop_word_words = remove_stop_words(words, EN)
-    stemmer = PorterStemmer()
-    stemmed_words = [stemmer.stem(word) for word in non_stop_word_words]
-    return stemmed_words
-
-
-LANGUAGE_PREPROCESSORS = {
-    FA: preprocess_fa_language,
-    EN: preprocess_en_document,
-}
-
-
 def preprocess_document_of_language(document: str, lang):
-    preprocessor = LANGUAGE_PREPROCESSORS[lang]
-    return preprocessor(document)
+    normalized_document = LANGUAGE_NORMALIZER[lang](document)
+    tokens = LANGUAGE_TOKENIZER[lang](normalized_document)
+    words = remove_punctuation(tokens, lang)
+    non_stop_word_words = remove_stop_words(words, lang)
+    stemmed_words = {position: LANGUAGE_STEMMER[lang](word) for position, word in non_stop_word_words.items()}
+    return stemmed_words
 
 
 LANGUAGE_CONTAINS_LETTER = {
