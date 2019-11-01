@@ -4,12 +4,15 @@ from hazm import Normalizer, WordTokenizer, Stemmer
 from hazm.utils import stopwords_list
 from nltk.corpus import stopwords
 from nltk import download
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
 
 FA = 'fa'
 EN = 'en'
 LANGUAGES = (FA, EN)
 
 download('stopwords')
+download('punkt')
 LANGUAGE_STOPWORDS = {
     FA: set(stopwords_list()),
     EN: set(stopwords.words('english')),
@@ -48,7 +51,13 @@ def preprocess_fa_language(document: str):
 
 
 def preprocess_en_document(document: str):
-    pass
+    normalized_document = document.lower()
+    tokens = word_tokenize(normalized_document)
+    words = remove_punctuation(tokens, EN)
+    non_stop_word_words = remove_stop_words(words, EN)
+    stemmer = PorterStemmer()
+    stemmed_words = [stemmer.stem(word) for word in non_stop_word_words]
+    return stemmed_words
 
 
 LANGUAGE_PREPROCESSORS = {

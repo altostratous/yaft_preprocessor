@@ -1,5 +1,4 @@
 from django.test import SimpleTestCase
-import json
 
 
 class TestPreprocessor(SimpleTestCase):
