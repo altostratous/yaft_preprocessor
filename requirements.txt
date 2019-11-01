@@ -1,5 +1,5 @@
 Django==2.2.6
-django-restframework==0.0.1
+djangorestframework==3.10.3
 hazm==0.7.0
 libwapiti==0.2.1
 nltk==3.3
