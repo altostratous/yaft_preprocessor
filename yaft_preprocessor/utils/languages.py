@@ -3,15 +3,16 @@ from string import ascii_letters
 from hazm import Normalizer, WordTokenizer, Stemmer
 from hazm.utils import stopwords_list
 from nltk.corpus import stopwords
-from nltk.tokenize import wordpunct_tokenize
+from nltk import download
 
 FA = 'fa'
 EN = 'en'
 LANGUAGES = (FA, EN)
 
+download('stopwords')
 LANGUAGE_STOPWORDS = {
     FA: set(stopwords_list()),
-    EN: set(stopwords),
+    EN: set(stopwords.words('english')),
 }
 
 
@@ -56,9 +57,8 @@ LANGUAGE_PREPROCESSORS = {
 }
 
 
-def preprocess_document_of_unknown_language(document: str):
-    language = get_document_language(document)
-    preprocessor = LANGUAGE_PREPROCESSORS[language]
+def preprocess_document_of_language(document: str, lang):
+    preprocessor = LANGUAGE_PREPROCESSORS[lang]
     return preprocessor(document)
 
 
@@ -73,3 +73,7 @@ def get_document_language(document):
         for language in LANGUAGE_CONTAINS_LETTER:
             if LANGUAGE_CONTAINS_LETTER[language](letter):
                 return language
+
+
+def process_document_of_unknown_language(document):
+    return preprocess_document_of_language(document, get_document_language(document))
