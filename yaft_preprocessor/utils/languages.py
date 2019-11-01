@@ -25,7 +25,7 @@ class EnglishPunctuationSet:
 
 
 LANGUAGE_PUNCTUATION = {
-    FA: '\.:!،؛؟»\]\)\}«\[\(\{',
+    FA: '*\.:!،؛؟»\]\)\}«\[\(\{',
     EN: EnglishPunctuationSet(),
 }
 
