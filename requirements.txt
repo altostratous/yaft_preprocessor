@@ -1,0 +1,8 @@
+Django==2.2.6
+django-restframework==0.0.1
+hazm==0.7.0
+libwapiti==0.2.1
+nltk==3.3
+pytz==2019.3
+six==1.12.0
+sqlparse==0.3.0
