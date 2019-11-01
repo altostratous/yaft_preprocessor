@@ -58,8 +58,7 @@ def preprocess_document_of_language(document: str, lang):
     normalized_document = LANGUAGE_NORMALIZER[lang](document)
     tokens = LANGUAGE_TOKENIZER[lang](normalized_document)
     words = remove_punctuation(tokens, lang)
-    non_stop_word_words = remove_stop_words(words, lang)
-    stemmed_words = {position: LANGUAGE_STEMMER[lang](word) for position, word in non_stop_word_words.items()}
+    stemmed_words = {position: LANGUAGE_STEMMER[lang](word) for position, word in enumerate(words)}
     return stemmed_words
 
 
