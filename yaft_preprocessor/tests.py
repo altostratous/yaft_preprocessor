@@ -53,3 +53,21 @@ class TestCompression(APISimpleTestCase):
             }, format='json')
             integer_lists = response.json()
             self.assertDictEqual(integer_lists, original_integer_lists)
+
+    def test_compression_in_size(self):
+        number_of_integers = 10000
+        integers = set()
+        for _ in range(number_of_integers):
+            integers.add(random.randint(1, 10e6))
+        integers = sorted(list(integers))
+        for compression_type in COMPRESSION_TYPES:
+            response = self.client.post('/api/v1/compress?type={}'.format(compression_type), data={
+                'integer_lists': {
+                    '1': integers,
+                }
+            }, format='json')
+            compressed_values = response.json()
+            compressed_number_of_bytes = len(compressed_values['1']) / 2
+            fixed_length_number_of_bytes = len(integers) * 4
+            print(compressed_number_of_bytes, fixed_length_number_of_bytes, compression_type)
+            self.assertLess(compressed_number_of_bytes, fixed_length_number_of_bytes, msg=compression_type)
