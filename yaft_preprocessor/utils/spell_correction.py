@@ -7,9 +7,10 @@ from yaft_preprocessor.utils.languages import process_document_of_unknown_langua
 
 class BiwordIndex:
 
-    dictionary = defaultdict(list)
-    words = []
-    word_set = set()
+    def __init__(self):
+        self.dictionary = defaultdict(list)
+        self.words = []
+        self.word_set = set()
 
     def index_words(self, words: list):
         words = [word for word in words if word not in self.word_set]

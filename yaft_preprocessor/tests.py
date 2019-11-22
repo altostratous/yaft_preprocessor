@@ -101,3 +101,34 @@ class TestQueryPreprocess(APISimpleTestCase):
                     format='json'
                 ).json(), reference
             )
+
+    def test_reset(self):
+        queries = [
+            'John Smith was a good guy helping all the world of publication with his own name.',
+            'این پرس‌وجوی فارسی باید نسبت به یافتن کلمات اصلی مقاوم باشد.',
+        ]
+        fault_queries = [
+            'John Smit was a good guye helping all the world of publicaiton wih his own name.',
+            'این پرس‌وجو فارسی باید نستت به یافتن کمات اصلی مقام باشد.',
+        ]
+        for query, fault_query in zip(queries, fault_queries):
+            reference = get_preprocessed_words_in_order(query)
+            self.assertEqual(
+                self.client.post(
+                    '/api/v1/index_words',
+                    data={'words': reference},
+                    format='json'
+                ).status_code, 200)
+            self.assertEqual(
+                self.client.post(
+                    '/api/v1/index_words?reset=true',
+                    data={'words': []},
+                    format='json'
+                ).status_code, 200)
+            self.assertListEqual(
+                self.client.post(
+                    '/api/v1/preprocess_query',
+                    data={'query': fault_query},
+                    format='json'
+                ).json(), get_preprocessed_words_in_order(fault_query)
+            )
