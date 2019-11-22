@@ -45,7 +45,10 @@ class IndexWordsView(APIView):
     def post(self, request):
         data = request.data
         words = data.get('words')
-        index_words(words)
+        reset = False
+        if request.GET.get('reset') == 'true':
+            reset = True
+        index_words(words, reset)
         return Response({'status': 'success'}, 200)
 
 

@@ -53,8 +53,8 @@ class BiwordIndex:
         return {self.words[word_id]: results[word_id] for word_id in results}
 
 
-def index_words(words: list):
-    biword_index = cache.get('biword_index', BiwordIndex())
+def index_words(words: list, reset=False):
+    biword_index = BiwordIndex() if reset else cache.get('biword_index', BiwordIndex())
     biword_index.index_words(words)
     cache.set('biword_index', biword_index)
 
