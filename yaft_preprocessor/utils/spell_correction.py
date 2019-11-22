@@ -9,9 +9,12 @@ class BiwordIndex:
 
     dictionary = defaultdict(list)
     words = []
-    word_set = {}
+    word_set = set()
 
     def index_words(self, words: list):
+        words = [word for word in words if word not in self.word_set]
+        for word in words:
+            self.word_set.add(word)
         self.update_index(*self.create_index(words))
 
     @staticmethod
