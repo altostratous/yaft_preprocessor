@@ -54,11 +54,11 @@ def remove_punctuation(tokens, language):
     return [token for token in tokens if token not in LANGUAGE_PUNCTUATION[language]]
 
 
-def preprocess_document_of_language(document: str, lang):
+def preprocess_document_of_language(document: str, lang, stem=True):
     normalized_document = LANGUAGE_NORMALIZER[lang](document)
     tokens = LANGUAGE_TOKENIZER[lang](normalized_document)
     words = remove_punctuation(tokens, lang)
-    stemmed_words = {position: LANGUAGE_STEMMER[lang](word) for position, word in enumerate(words)}
+    stemmed_words = {position: LANGUAGE_STEMMER[lang](word) if stem else word for position, word in enumerate(words)}
     return stemmed_words
 
 
@@ -75,5 +75,5 @@ def get_document_language(document):
                 return language
 
 
-def process_document_of_unknown_language(document):
-    return preprocess_document_of_language(document, get_document_language(document))
+def process_document_of_unknown_language(document, stem=True):
+    return preprocess_document_of_language(document, get_document_language(document), stem=stem)

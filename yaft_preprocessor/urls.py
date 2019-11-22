@@ -16,11 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from yaft_preprocessor.views import PreprocessView, CompressView, DecompressView
+from yaft_preprocessor.views import PreprocessView, CompressView, DecompressView, IndexWordsView, PreprocessQueryView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/preprocess_documents', PreprocessView.as_view()),
     path('api/v1/compress', CompressView.as_view()),
     path('api/v1/decompress', DecompressView.as_view()),
+    path('api/v1/index_words', IndexWordsView.as_view()),
+    path('api/v1/preprocess_query', PreprocessQueryView.as_view()),
 ]

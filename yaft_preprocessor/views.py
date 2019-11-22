@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from yaft_preprocessor.utils.compression import COMPRESSION_TYPES, compress_lists, decompress_values
 from yaft_preprocessor.utils.languages import LANGUAGES
 from yaft_preprocessor.utils.preprocess import preprocess_documents
+from yaft_preprocessor.utils.spell_correction import index_words, preprocess_query
 
 
 class PreprocessView(APIView):
@@ -37,3 +38,20 @@ class DecompressView(APIView):
         data = request.data
         compressed_values = data.get('compressed_values')
         return Response(decompress_values(compressed_values, compression_type))
+
+
+class IndexWordsView(APIView):
+
+    def post(self, request):
+        data = request.data
+        words = data.get('words')
+        index_words(words)
+        return Response({'status': 'success'}, 200)
+
+
+class PreprocessQueryView(APIView):
+
+    def post(self, request):
+        data = request.data
+        query = data.get('query')
+        return Response(preprocess_query(query), 200)
