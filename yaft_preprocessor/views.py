@@ -101,7 +101,7 @@ class ClassifyView(APIView):
         if scheduled:
             return Response({"status": "accepted", "detail": "Model is not ready yet"}, 202)
         else:
-            return Response({"status": "to_many_requests", "detail": "Resource not enough."}, 429)
+            return Response({"status": "to_many_requests", "detail": "Resource not enough."}, 204)
 
 
 class PreprocessQueryView(APIView):
