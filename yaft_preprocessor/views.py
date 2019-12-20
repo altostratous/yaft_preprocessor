@@ -1,3 +1,4 @@
+import os
 from django.core.cache import caches, cache
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
@@ -66,17 +67,16 @@ class CollectDataSetView(APIView):
             reset = True
         collect_documents(documents, reset)
         if reset:
-            for key in caches['classification'].keys('classifier:*'):
-                caches['classification'].delete(key)
+            os.system('rm -rf /var/tmp/yaft_classification')
         return Response({'status': 'success'}, 200)
 
 
 def prepare_model(key, method, param):
-    is_under_process = cache.get('classification_is_under_process')
+    is_under_process = caches['classification'].get('classification_is_under_process')
     if is_under_process:
         return False
     train.delay(key, method, param)
-    cache.set('classification_is_under_process', True)
+    caches['classification'].set('classification_is_under_process', True)
     return True
 
 
