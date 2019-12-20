@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from yaft_preprocessor.utils.classification import collect_documents
 from yaft_preprocessor.utils.compression import COMPRESSION_TYPES, compress_lists, decompress_values
 from yaft_preprocessor.utils.languages import LANGUAGES
 from yaft_preprocessor.utils.preprocess import preprocess_documents
@@ -49,6 +50,18 @@ class IndexWordsView(APIView):
         if request.GET.get('reset') == 'true':
             reset = True
         index_words(words, reset)
+        return Response({'status': 'success'}, 200)
+
+
+class CollectDataSetView(APIView):
+
+    def post(self, request):
+        data = request.data
+        documents = data.get('documents')
+        reset = False
+        if request.GET.get('reset') == 'true':
+            reset = True
+        collect_documents(documents, reset)
         return Response({'status': 'success'}, 200)
 
 

@@ -125,7 +125,12 @@ STATIC_URL = '/static/'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'yaft',
+        'LOCATION': 'yaft_classification',
         'TIMEOUT': None
+    },
+    'classification': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/yaft_classification',
+        'TIMEOUT': None,
     }
 }
