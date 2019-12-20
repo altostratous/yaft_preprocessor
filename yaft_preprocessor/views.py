@@ -65,9 +65,9 @@ class CollectDataSetView(APIView):
         reset = False
         if request.GET.get('reset') == 'true':
             reset = True
-        collect_documents(documents, reset)
         if reset:
             os.system('rm -rf /var/tmp/yaft_classification')
+        collect_documents(documents, reset)
         return Response({'status': 'success'}, 200)
 
 
