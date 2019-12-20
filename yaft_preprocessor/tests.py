@@ -1,4 +1,5 @@
 import random
+from time import sleep
 
 from rest_framework.test import APISimpleTestCase
 
@@ -157,26 +158,29 @@ class TestClassification(APISimpleTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(
-            '/api/v1/classify?method=svm&param=1.0',
-            data={
-                'vectors': [
-                    {
-                        'vector': {0: 100, 1: 0},
-                        'id': 1,
-                    },
-                    {
-                        'vector': {0: 0, 1: 1000},
-                        'id': 2,
-                    },
-                    {
-                        'vector': {0: -2, 1: -2},
-                        'id': 3,
-                    }
-                ]
-            },
-            format='json'
-        )
+        response = None
+        while not response or response.status_code in (202, 204):
+            response = self.client.post(
+                '/api/v1/classify?method=svm&param=1.0',
+                data={
+                    'vectors': [
+                        {
+                            'vector': {0: 100, 1: 0},
+                            'id': 1,
+                        },
+                        {
+                            'vector': {0: 0, 1: 1000},
+                            'id': 2,
+                        },
+                        {
+                            'vector': {0: -2, 1: -2},
+                            'id': 3,
+                        }
+                    ]
+                },
+                format='json'
+            )
+            sleep(1)
 
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(
@@ -205,26 +209,80 @@ class TestClassification(APISimpleTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+        response = None
+        while not response or response.status_code in (202, 204):
+            response = self.client.post(
+                '/api/v1/classify?method=rndfrst&param=1.0',
+                data={
+                    'vectors': [
+                        {
+                            'vector': {0: 100, 1: 0},
+                            'id': 1,
+                        },
+                        {
+                            'vector': {0: 0, 1: 1000},
+                            'id': 2,
+                        },
+                        {
+                            'vector': {0: -2, 1: -2},
+                            'id': 3,
+                        }
+                    ]
+                },
+                format='json'
+            )
+            sleep(1)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.json(),
+            {str(i): i for i in range(1, 4)}
+        )
+
+    def test_naive_bayes_classifier(self):
         response = self.client.post(
-            '/api/v1/classify?method=rndfrst&param=1.0',
-            data={
-                'vectors': [
-                    {
-                        'vector': {0: 100, 1: 0},
-                        'id': 1,
-                    },
-                    {
-                        'vector': {0: 0, 1: 1000},
-                        'id': 2,
-                    },
-                    {
-                        'vector': {0: -2, 1: -2},
-                        'id': 3,
-                    }
-                ]
-            },
+            '/api/v1/collect_data_set?reset=true',
+            data={'vectors': [
+                {
+                    'vector': {0: 1, 1: 0, 2: 0},
+                    'class': 1
+                },
+                {
+                    'vector': {0: 0, 1: 1, 2: 0},
+                    'class': 2
+                },
+                {
+                    'vector': {0: 0, 1: 0, 2: 1},
+                    'class': 3
+                },
+            ]},
             format='json'
         )
+        self.assertEqual(response.status_code, 200)
+
+        response = None
+        while not response or response.status_code in (202, 204):
+            response = self.client.post(
+                '/api/v1/classify?method=naivebayes&param=1.0',
+                data={
+                    'vectors': [
+                        {
+                            'vector': {0: 1, 1: 0, 2: 0},
+                            'id': 1,
+                        },
+                        {
+                            'vector': {0: 0, 1: 1, 2: 0},
+                            'id': 2,
+                        },
+                        {
+                            'vector': {0: 0, 1: 0, 2: 1},
+                            'id': 3,
+                        }
+                    ]
+                },
+                format='json'
+            )
+            sleep(1)
 
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(

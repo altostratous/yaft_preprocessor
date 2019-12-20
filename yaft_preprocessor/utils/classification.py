@@ -17,10 +17,13 @@ class Classifier:
 
     @staticmethod
     def factory(method, param):
+        from .naive_base_classifier import NaiveBayesClassifier
         if method == 'svm':
             return SVMClassifier(method, param)
         if method == 'rndfrst':
             return RandomForestClassifier(method, param)
+        if method == 'naivebayes':
+            return NaiveBayesClassifier(method, param)
 
     def __init__(self, method: str, param: float) -> None:
         self.method = method

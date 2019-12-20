@@ -10,8 +10,9 @@ app = Celery('tasks', broker='pyamqp://guest@localhost//')
 
 @app.task
 def train(key, method, param):
+    print('computing {}'.format(key))
     classifier = Classifier.factory(method, param)
     classifier.train()
     print('setting {}'.format(key))
     caches['classification'].set(key, classifier)
-    cache.set('classification_is_under_process', False)
+    caches['classification'].set('classification_is_under_process', False)
