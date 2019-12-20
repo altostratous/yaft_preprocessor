@@ -10,3 +10,4 @@ six==1.12.0
 sqlparse==0.3.0
 vbcode==0.2.0
 sklearn==0.0
+celery==4.4.0

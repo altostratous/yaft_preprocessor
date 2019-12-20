@@ -1,3 +1,5 @@
+from celery import shared_task
+from django.core.cache import caches, cache
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -63,13 +65,27 @@ class CollectDataSetView(APIView):
         if request.GET.get('reset') == 'true':
             reset = True
         collect_documents(documents, reset)
+        if reset:
+            for key in caches['classification'].keys('classifier:*'):
+                caches['classification'].delete(key)
         return Response({'status': 'success'}, 200)
 
 
-def classify_documents(documents, method, param):
+def prepare_model(key, method, param):
+    is_under_process = cache.get('classification_is_under_process')
+    if is_under_process:
+        return False
+    train.delay(key, method, param)
+    cache.set('classification_is_under_process', True)
+    return True
+
+
+@shared_task
+def train(key, method, param):
     classifier = Classifier(method, param)
     classifier.train()
-    return classifier.classify_documents(documents['vectors'])
+    caches['classification'].set(key, classifier)
+    cache.set('classification_is_under_process', False)
 
 
 class ClassifyView(APIView):
@@ -85,7 +101,15 @@ class ClassifyView(APIView):
                 {'status': 'Please give `method` as string and `param` a float.'},
                 status=HTTP_400_BAD_REQUEST
             )
-        return Response(classify_documents(documents, method=method, param=param), 200)
+        key = 'classifier:{}:{}'.format(method, param)
+        already_classifier = caches['classification'].get(key)
+        if already_classifier:
+            Response(already_classifier.classify_documents(documents['vectors']), 200)
+        scheduled = prepare_model(key, method, param)
+        if scheduled:
+            return Response({"status": "accepted", "detail": "Model is not ready yet"}, 202)
+        else:
+            return Response({"status": "to_many_requests", "detail": "Resource not enough."}, 429)
 
 
 class PreprocessQueryView(APIView):
