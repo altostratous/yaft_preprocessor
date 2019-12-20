@@ -1,10 +1,10 @@
-from celery import shared_task
 from django.core.cache import caches, cache
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from yaft_preprocessor.utils.classification import collect_documents, Classifier
+from yaft_preprocessor.celery import train
+from yaft_preprocessor.utils.classification import collect_documents
 from yaft_preprocessor.utils.compression import COMPRESSION_TYPES, compress_lists, decompress_values
 from yaft_preprocessor.utils.languages import LANGUAGES
 from yaft_preprocessor.utils.preprocess import preprocess_documents
@@ -78,14 +78,6 @@ def prepare_model(key, method, param):
     train.delay(key, method, param)
     cache.set('classification_is_under_process', True)
     return True
-
-
-@shared_task
-def train(key, method, param):
-    classifier = Classifier(method, param)
-    classifier.train()
-    caches['classification'].set(key, classifier)
-    cache.set('classification_is_under_process', False)
 
 
 class ClassifyView(APIView):
