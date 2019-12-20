@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import Any
 
 from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier as SKRandomForestClassifier
 
 from django.core.cache import caches
 
@@ -19,7 +20,7 @@ class Classifier:
             if method == 'svm':
                 return super(Classifier, cls).__new__(SVMClassifier)
             if method == 'rndfrst':
-                raise NotImplemented
+                return super(Classifier, cls).__new__(RandomForestClassifier)
         else:
             return super(Classifier, cls).__new__(cls, method, param)
 
@@ -65,6 +66,19 @@ class SVMClassifier(Classifier):
     def __init__(self, method: str, param: float) -> None:
         super().__init__(method, param)
         self.classifier = LinearSVC(C=self.param)
+
+    def classify_document(self, document) -> int:
+        return self.classifier.predict([self.expand_vector(document)])[0]
+
+
+class RandomForestClassifier(Classifier):
+
+    def train_using_training_set(self, x, y):
+        self.classifier.fit(x, y)
+
+    def __init__(self, method: str, param: float) -> None:
+        super().__init__(method, param)
+        self.classifier = SKRandomForestClassifier()
 
     def classify_document(self, document) -> int:
         return self.classifier.predict([self.expand_vector(document)])[0]

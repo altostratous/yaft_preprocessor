@@ -136,7 +136,7 @@ class TestQueryPreprocess(APISimpleTestCase):
 
 class TestClassification(APISimpleTestCase):
 
-    def test_classification(self):
+    def test_svm_classifier(self):
         response = self.client.post(
             '/api/v1/collect_data_set?reset=true',
             data={'vectors': [
@@ -173,3 +173,39 @@ class TestClassification(APISimpleTestCase):
             {str(i): i for i in range(1, 4)}
         )
 
+    def test_random_forest_classifier(self):
+        response = self.client.post(
+            '/api/v1/collect_data_set?reset=true',
+            data={'vectors': [
+                {
+                    'vector': {0: 1, 1: 0},
+                    'class': 1
+                },
+                {
+                    'vector': {0: 0, 1: 1},
+                    'class': 2
+                },
+                {
+                    'vector': {0: -1, 1: -1},
+                    'class': 3
+                },
+            ]},
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(
+            '/api/v1/classify?method=rndfrst&param=1.0',
+            data={
+                1: {0: 100, 1: 0},
+                2: {0: 0, 1: 1000},
+                3: {0: -2, 1: -2},
+            },
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.json(),
+            {str(i): i for i in range(1, 4)}
+        )
