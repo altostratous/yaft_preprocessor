@@ -15,14 +15,12 @@ def collect_documents(documents, reset):
 
 class Classifier:
 
-    def __new__(cls, method: str, param: float) -> Any:
-        if cls is Classifier:
-            if method == 'svm':
-                return super(Classifier, cls).__new__(SVMClassifier)
-            if method == 'rndfrst':
-                return super(Classifier, cls).__new__(RandomForestClassifier)
-        else:
-            return super(Classifier, cls).__new__(cls, method, param)
+    @staticmethod
+    def factory(method, param):
+        if method == 'svm':
+            return SVMClassifier(method, param)
+        if method == 'rndfrst':
+            return RandomForestClassifier(method, param)
 
     def __init__(self, method: str, param: float) -> None:
         self.method = method
