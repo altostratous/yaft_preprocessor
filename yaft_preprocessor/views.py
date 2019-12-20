@@ -4,7 +4,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from yaft_preprocessor.tasks import train
+from yaft_preprocessor.celery import train
 from yaft_preprocessor.utils.classification import collect_documents
 from yaft_preprocessor.utils.compression import COMPRESSION_TYPES, compress_lists, decompress_values
 from yaft_preprocessor.utils.languages import LANGUAGES
