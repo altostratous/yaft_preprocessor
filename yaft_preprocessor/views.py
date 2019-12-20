@@ -69,7 +69,7 @@ class CollectDataSetView(APIView):
 def classify_documents(documents, method, param):
     classifier = Classifier(method, param)
     classifier.train()
-    return classifier.classify_documents(documents)
+    return classifier.classify_documents(documents['vectors'])
 
 
 class ClassifyView(APIView):

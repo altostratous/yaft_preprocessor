@@ -160,9 +160,20 @@ class TestClassification(APISimpleTestCase):
         response = self.client.post(
             '/api/v1/classify?method=svm&param=1.0',
             data={
-                1: {0: 100, 1: 0},
-                2: {0: 0, 1: 1000},
-                3: {0: -2, 1: -2},
+                'vectors': [
+                    {
+                        'vector': {0: 100, 1: 0},
+                        'id': 1,
+                    },
+                    {
+                        'vector': {0: 0, 1: 1000},
+                        'id': 2,
+                    },
+                    {
+                        'vector': {0: -2, 1: -2},
+                        'id': 3,
+                    }
+                ]
             },
             format='json'
         )
@@ -197,9 +208,20 @@ class TestClassification(APISimpleTestCase):
         response = self.client.post(
             '/api/v1/classify?method=rndfrst&param=1.0',
             data={
-                1: {0: 100, 1: 0},
-                2: {0: 0, 1: 1000},
-                3: {0: -2, 1: -2},
+                'vectors': [
+                    {
+                        'vector': {0: 100, 1: 0},
+                        'id': 1,
+                    },
+                    {
+                        'vector': {0: 0, 1: 1000},
+                        'id': 2,
+                    },
+                    {
+                        'vector': {0: -2, 1: -2},
+                        'id': 3,
+                    }
+                ]
             },
             format='json'
         )

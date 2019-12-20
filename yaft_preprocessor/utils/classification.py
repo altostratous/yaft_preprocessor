@@ -35,7 +35,7 @@ class Classifier:
         raise NotImplemented
 
     def classify_documents(self, documents: dict):
-        return {doc_id: self.classify_document(document) for doc_id, document in documents.items()}
+        return {document['id']: self.classify_document(document['vector']) for document in documents}
 
     def train(self):
         training_set = caches['classification'].get('classification_dataset', [])
