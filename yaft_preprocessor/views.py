@@ -96,7 +96,7 @@ class ClassifyView(APIView):
         key = 'classifier:{}:{}'.format(method, param)
         already_classifier = caches['classification'].get(key)
         if already_classifier:
-            Response(already_classifier.classify_documents(documents['vectors']), 200)
+            return Response(already_classifier.classify_documents(documents['vectors']), 200)
         scheduled = prepare_model(key, method, param)
         if scheduled:
             return Response({"status": "accepted", "detail": "Model is not ready yet"}, 202)
