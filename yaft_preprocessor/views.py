@@ -1,7 +1,8 @@
+from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from yaft_preprocessor.utils.classification import collect_documents
+from yaft_preprocessor.utils.classification import collect_documents, Classifier
 from yaft_preprocessor.utils.compression import COMPRESSION_TYPES, compress_lists, decompress_values
 from yaft_preprocessor.utils.languages import LANGUAGES
 from yaft_preprocessor.utils.preprocess import preprocess_documents
@@ -57,12 +58,34 @@ class CollectDataSetView(APIView):
 
     def post(self, request):
         data = request.data
-        documents = data.get('documents')
+        documents = data.get('vectors')
         reset = False
         if request.GET.get('reset') == 'true':
             reset = True
         collect_documents(documents, reset)
         return Response({'status': 'success'}, 200)
+
+
+def classify_documents(documents, method, param):
+    classifier = Classifier(method, param)
+    classifier.train()
+    return classifier.classify_documents(documents)
+
+
+class ClassifyView(APIView):
+
+    def post(self, request):
+        data = request.data
+        documents = data
+        try:
+            method = request.GET.get('method')
+            param = float(request.GET.get('param'))
+        except ValueError:
+            return Response(
+                {'status': 'Please give `method` as string and `param` a float.'},
+                status=HTTP_400_BAD_REQUEST
+            )
+        return Response(classify_documents(documents, method=method, param=param), 200)
 
 
 class PreprocessQueryView(APIView):
