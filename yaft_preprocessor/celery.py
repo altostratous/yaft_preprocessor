@@ -1,4 +1,4 @@
-from celery import Celery, app
+from celery import Celery
 import django
 django.setup()
 from django.core.cache import caches, cache
