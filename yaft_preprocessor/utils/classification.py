@@ -17,6 +17,7 @@ class Classifier:
 
     @staticmethod
     def factory(method, param):
+        from yaft_preprocessor.utils.knn_classifier import KNNClassifier
         from .naive_base_classifier import NaiveBayesClassifier
         if method == 'svm':
             return SVMClassifier(method, param)
@@ -24,6 +25,8 @@ class Classifier:
             return RandomForestClassifier(method, param)
         if method == 'naivebayes':
             return NaiveBayesClassifier(method, param)
+        if method == 'knn':
+            return KNNClassifier(method, param)
 
     def __init__(self, method: str, param: float) -> None:
         self.method = method
