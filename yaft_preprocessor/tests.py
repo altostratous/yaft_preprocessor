@@ -1,8 +1,10 @@
 import random
 from time import sleep
 
+from django.core.cache import caches
 from rest_framework.test import APISimpleTestCase
 
+from yaft_preprocessor.utils.classification import Classifier
 from yaft_preprocessor.utils.compression import COMPRESSION_TYPES
 from yaft_preprocessor.utils.languages import process_document_of_unknown_language
 from yaft_preprocessor.utils.spell_correction import get_preprocessed_words_in_order
@@ -291,26 +293,22 @@ class TestClassification(APISimpleTestCase):
         )
 
     def test_knn_classifier(self):
-        response = self.client.post(
-            '/api/v1/collect_data_set?reset=true',
-            data={'vectors': [
-                {
-                    'vector': {0: 1, 1: 0, 2: 0},
-                    'class': 1
-                },
-                {
-                    'vector': {0: 0, 1: 1, 2: 0},
-                    'class': 2
-                },
-                {
-                    'vector': {0: 0, 1: 0, 2: 1},
-                    'class': 3
-                },
-            ]},
-            format='json'
-        )
-        self.assertEqual(response.status_code, 200)
+        # response = self.client.post(
+        #     '/api/v1/collect_data_set?reset=true',
+        #     data={
+        #         'vectors': [
+        #             {
+        #                 'vector': {j: 1 if j == i % 900 else 0 for j in range(900)},
+        #                 'class': i % 4,
+        #             } for i in range(9000)
+        #         ]
+        #     },
+        #     format='json'
+        # )
+        # self.assertEqual(response.status_code, 200)
 
+        training_set = caches['classification'].get('classification_dataset', [])
+        test_set = training_set[:100]
         response = None
         while not response or response.status_code in (202, 204):
             response = self.client.post(
@@ -318,17 +316,9 @@ class TestClassification(APISimpleTestCase):
                 data={
                     'vectors': [
                         {
-                            'vector': {0: 1, 1: 0, 2: 0},
-                            'id': 1,
-                        },
-                        {
-                            'vector': {0: 0, 1: 1, 2: 0},
-                            'id': 2,
-                        },
-                        {
-                            'vector': {0: 0, 1: 0, 2: 1},
-                            'id': 3,
-                        }
+                            'vector': element['vector'],
+                            'id': i,
+                        } for i, element in enumerate(test_set)
                     ]
                 },
                 format='json'
@@ -336,7 +326,7 @@ class TestClassification(APISimpleTestCase):
             sleep(1)
 
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(
-            response.json(),
-            {str(i): i for i in range(1, 4)}
-        )
+        # self.assertDictEqual(
+        #     response.json(),
+        #     {str(i): i for i in range(1, 4)}
+        # )

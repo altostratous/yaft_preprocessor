@@ -31,9 +31,9 @@ class NaiveBayesClassifier(Classifier):
         for i in range(self.n):
             summation = sum(term_counts[i].values())
             for label in label_counts:
-                self.p_t_c[i][label] = term_counts[i][label] / summation if summation else 1
+                self.p_t_c[i][label] = term_counts[i][label] / summation if summation else 0.5
 
     def calculate_document_score_for_class(self, document, c):
         return numpy.log(self.p_c[c]) + sum(map(numpy.log, [
-            self.p_t_c[int(i)][c] for i, w in document.items() if float(w) > 0
+            self.p_t_c.get(int(i), {}).get(c, 0.5) for i, w in document.items() if float(w) > 0
         ]))

@@ -39,7 +39,12 @@ class Classifier:
         raise NotImplemented
 
     def classify_documents(self, documents: dict):
-        return {document['id']: self.classify_document(document['vector']) for document in documents}
+        result = {}
+        for i, document in enumerate(documents):
+            if i % 100 == 0:
+                print(i)
+            result[document['id']] = self.classify_document(document['vector'])
+        return result
 
     def train(self):
         training_set = caches['classification'].get('classification_dataset', [])
@@ -56,8 +61,12 @@ class Classifier:
         raise NotImplemented
 
     def expand_vector(self, positional_vector):
+        return self.expend_vector_of_size(positional_vector, self.n)
+
+    @staticmethod
+    def expend_vector_of_size(positional_vector, n):
         result = []
-        for i in range(self.n):
+        for i in range(n):
             result.append(int(positional_vector.get(str(i), 0)))
         return result
 
