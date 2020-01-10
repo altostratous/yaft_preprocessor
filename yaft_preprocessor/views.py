@@ -1,11 +1,12 @@
 import os
-from django.core.cache import caches, cache
+from django.core.cache import caches
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from yaft_preprocessor.celery import train
 from yaft_preprocessor.utils.classification import collect_documents
+from yaft_preprocessor.utils.clustering import cluster
 from yaft_preprocessor.utils.compression import COMPRESSION_TYPES, compress_lists, decompress_values
 from yaft_preprocessor.utils.languages import LANGUAGES
 from yaft_preprocessor.utils.preprocess import preprocess_documents
@@ -110,3 +111,12 @@ class PreprocessQueryView(APIView):
         data = request.data
         query = data.get('query')
         return Response(preprocess_query(query), 200)
+
+
+class ClusterView(APIView):
+
+    def post(self, request):
+        documents = request.data['vectors']
+        classifier_slug = request.GET.get('method')
+        k = int(request.GET.get('k'))
+        return Response(cluster(documents, classifier_slug, k), 200)

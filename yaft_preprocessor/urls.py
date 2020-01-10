@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 
 from yaft_preprocessor.views import PreprocessView, CompressView, DecompressView, IndexWordsView, PreprocessQueryView, \
-    CollectDataSetView, ClassifyView
+    CollectDataSetView, ClassifyView, ClusterView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,4 +28,5 @@ urlpatterns = [
     path('api/v1/preprocess_query', PreprocessQueryView.as_view()),
     path('api/v1/collect_data_set', CollectDataSetView.as_view()),
     path('api/v1/classify', ClassifyView.as_view()),
+    path('api/v1/cluster', ClusterView.as_view()),
 ]

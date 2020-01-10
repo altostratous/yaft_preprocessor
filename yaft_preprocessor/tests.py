@@ -330,3 +330,75 @@ class TestClassification(APISimpleTestCase):
         #     response.json(),
         #     {str(i): i for i in range(1, 4)}
         # )
+
+
+class TestClustering(APISimpleTestCase):
+
+    def test_kmeans(self):
+        response = self.client.post(
+            '/api/v1/cluster?method=kmeans&k=3',
+            data={'vectors': [
+                {
+                    'vector': {0: 1, 1: 0},
+                    'id': 1
+                },
+                {
+                    'vector': {0: 0, 1: 1},
+                    'id': 2
+                },
+                {
+                    'vector': {0: -1, 1: -1},
+                    'id': 3
+                },
+            ]},
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(set(response.json().values())), 3)
+
+    def test_gmm(self):
+        response = self.client.post(
+            '/api/v1/cluster?method=gmm&k=3',
+            data={'vectors': [
+                {
+                    'vector': {0: 1, 1: 0},
+                    'id': 1
+                },
+                {
+                    'vector': {0: 0, 1: 1},
+                    'id': 2
+                },
+                {
+                    'vector': {0: -1, 1: -1},
+                    'id': 3
+                },
+            ]},
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(set(response.json().values())), 3)
+
+    def test_hierarchical(self):
+        response = self.client.post(
+            '/api/v1/cluster?method=hierarchical&k=2',
+            data={'vectors': [
+                {
+                    'vector': {0: 1, 1: 0},
+                    'id': 1
+                },
+                {
+                    'vector': {0: 0, 1: 1},
+                    'id': 2
+                },
+                {
+                    'vector': {0: -100, 1: -100},
+                    'id': 3
+                },
+            ]},
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        clusters = response.json()
+        self.assertEqual(clusters['1'], clusters['2'])
+        self.assertNotEqual(clusters['1'], clusters['3'])
+
